@@ -58,6 +58,15 @@ export async function POST(req: Request) {
     
   } catch (error: any) {
     console.error('Login error:', error);
+    const errorMessage = error instanceof Error ? error.message : '';
+    if (
+      errorMessage.includes('Database connection failed') ||
+      errorMessage.includes('MONGODB_URI') ||
+      error.name === 'MongoServerSelectionError' ||
+      error.name === 'MongooseServerSelectionError'
+    ) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
